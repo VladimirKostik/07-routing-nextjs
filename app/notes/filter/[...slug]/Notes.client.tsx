@@ -5,11 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useDebouncedCallback } from "use-debounce";
 
 import { getNotesByQuery, NoteTag } from "@/lib/api";
+import type { Note } from "@/types/note";
+
 import SearchBox from "@/components/SearchBox/SearchBox";
 import Pagination from "@/components/Pagination/Pagination";
 import Modal from "@/components/Modal/Modal";
 import NoteForm from "@/components/NoteForm/NoteForm";
-import NoteList from "@/components/NoteList/NoteList"; 
+import NoteList from "@/components/NoteList/NoteList";
 
 import css from "./Notes.module.css";
 
@@ -17,7 +19,7 @@ interface NotesClientProps {
 tag?: NoteTag;
 }
 
-function NotesClient({ tag }: NotesClientProps) {
+export default function NotesClient({ tag }: NotesClientProps) {
 const [searchTerm, setSearchTerm] = useState("");
 const [currentPage, setCurrentPage] = useState(1);
 const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,9 +39,15 @@ queryFn: () => getNotesByQuery(searchTerm, currentPage, tag),
 });
 
 const totalPages = data?.totalPages ?? 0;
+const notes: Note[] = data?.notes ?? [];
 
-const handleOpenModal: MouseEventHandler<HTMLButtonElement> = () => setIsModalOpen(true);
-const handleCloseModal = () => setIsModalOpen(false);
+const handleOpenModal: MouseEventHandler<HTMLButtonElement> = () => {
+setIsModalOpen(true);
+};
+
+const handleCloseModal = () => {
+setIsModalOpen(false);
+};
 
 return ( <div className={css.app}> <div className={css.toolbar}> <SearchBox onSearch={handleSearchChange} />
 
@@ -57,17 +65,14 @@ return ( <div className={css.app}> <div className={css.toolbar}> <SearchBox onSe
     </button>
   </div>
 
-
   {isLoading && <p>Loading notes...</p>}
   {isError && <p>Failed to load notes.</p>}
 
-
-  {data && data.notes.length > 0 && (
-    <NoteList category={tag} page={currentPage} />
+  {!isLoading && !isError && notes.length > 0 && (
+    <NoteList notes={notes} />
   )}
 
-
-  {data && data.notes.length === 0 && (
+  {!isLoading && !isError && notes.length === 0 && (
     <p>No notes found</p>
   )}
 
@@ -77,7 +82,7 @@ return ( <div className={css.app}> <div className={css.toolbar}> <SearchBox onSe
     </Modal>
   )}
 </div>
+
+
 );
 }
-
-export default NotesClient;

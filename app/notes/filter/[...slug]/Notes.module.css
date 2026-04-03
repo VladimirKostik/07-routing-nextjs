@@ -1,0 +1,13 @@
+.app {
+padding: 20px;
+}
+
+.toolbar {
+display: flex;
+gap: 10px;
+margin-bottom: 20px;
+}
+
+.button {
+padding: 8px 12px;
+}
